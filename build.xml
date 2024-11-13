@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="MiProyecto" default="dist" basedir=".">
+   
+   <!-- Propiedades -->
+   <property name="src.dir" value="src"/>
+   <property name="test.dir" value="test"/>
+   <property name="build.dir" value="build"/>
+   <property name="dist.dir" value="dist"/>
+   <property name="lib.dir" value="lib"/>
+   <property name="main.class" value="Vistas.MenuNomina"/>
+
+   <!-- Classpath de dependencias -->
+   <path id="classpath">
+       <fileset dir="${lib.dir}">
+           <include name="**/*.jar"/>
+       </fileset>
+   </path>
+
+   <!-- Inicializar directorios -->
+   <target name="init">
+       <mkdir dir="${build.dir}"/>
+       <mkdir dir="${dist.dir}"/>
+   </target>
+
+   <!-- Compilación del código fuente -->
+   <target name="compile" depends="init">
+       <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="classpath" includeantruntime="false">
+           <include name="**/*.java"/>
+       </javac>
+   </target>
+
+   <!-- Compilación del código de pruebas -->
+   <target name="compile-test" depends="compile">
+       <javac srcdir="${test.dir}" destdir="${build.dir}" classpathref="classpath" includeantruntime="false">
+           <include name="**/*.java"/>
+       </javac>
+   </target>
+
+   <!-- Ejecutar pruebas JUnit -->
+   <target name="test" depends="compile-test">
+       <mkdir dir="${build.dir}/test-reports"/>
+       <junit printsummary="true" haltonfailure="false">
+           <classpath>
+               <path refid="classpath"/>
+               <pathelement location="${build.dir}"/>
+           </classpath>
+           <formatter type="plain" />
+           <batchtest todir="${build.dir}/test-reports">
+               <fileset dir="${test.dir}">
+                   <include name="**/*Test.java"/>
+               </fileset>
+           </batchtest>
+       </junit>
+   </target>
+
+   <!-- Crear JAR ejecutable -->
+   <target name="jar" depends="compile">
+       <mkdir dir="${dist.dir}"/>
+       <jar destfile="${dist.dir}/MiProyecto.jar" basedir="${build.dir}">
+           <manifest>
+               <attribute name="Main-Class" value="${main.class}"/>
+               <attribute name="Class-Path" value="lib/"/>
+           </manifest>
+       </jar>
+   </target>
+
+   <!-- Limpieza de archivos compilados -->
+   <target name="clean">
+       <delete dir="${build.dir}"/>
+       <delete dir="${dist.dir}"/>
+   </target>
+
+   <!-- Distribuir (compilar, probar y empaquetar) -->
+   <target name="dist" depends="clean, compile, test, jar">
+       <echo message="Distribución completada. El archivo JAR se encuentra en: ${dist.dir}/MiProyecto.jar"/>
+   </target>
+</project>
